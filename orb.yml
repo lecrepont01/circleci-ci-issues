@@ -1,0 +1,85 @@
+version: 2.1
+description: Upload JUnit XML report to Mergify CI Issues
+
+commands:
+  upload:
+    description: Upload the XML report
+    parameters:
+      token:
+        type: env_var_name
+        description: CI Issues Application Key
+        default: MERGIFY_CI_ISSUES_TOKEN
+      repository_url:
+        description: |
+          URL of the repository (should provide pipeline.trigger_parameters.github_app.repo_url)
+        type: string
+      report_paths:
+        description: Paths of the XML files to upload
+        type: string
+      mergify_api_server:
+        description: URL of the Mergify API
+        type: string
+        default: https://api.mergify.com/v1
+    steps:
+      - run:
+          name: Uploading the reports to Mergify CI Issues
+          environment:
+            TOKEN: <<parameters.token>>
+            REPO_URL: <<parameters.repository_url>>
+            FILES: <<parameters.report_paths>>
+            MERGIFY_API_SERVER: <<parameters.mergify_api_server>>
+          when: always
+          command: |
+            set -x
+            if [[ $REPO_URL =~ ^https:\/\/github\.com\/([a-zA-Z0-9._-]+)\/([a-zA-Z0-9._-]+)$ ]]; then
+              REPO_FULL_NAME=${BASH_REMATCH[1]}/${BASH_REMATCH[2]}
+            else
+              echo "Invalid repository URL: $REPO_URL"
+              exit 1
+            fi
+
+            # TODO: support multiple files
+            curl -X POST \
+              -H "Authorization: bearer ${!TOKEN}" \
+              -F name=${CIRCLE_JOB} \
+              -F provider=circleci \
+              -F head_sha=${CIRCLE_SHA1} \
+              -F files=@${FILES} \
+              -o result.json \
+              ${MERGIFY_API_SERVER}/repos/${REPO_FULL_NAME}/ci_issues_upload \
+
+            echo "Display result"
+            cat result.json
+
+            GIGID=$(cat result.json | jq -r .gigid)
+            echo "::notice title=CI Issues report::CI_ISSUE_GIGID=$GIGID"
+
+          #            echo "CI_ISSUE_GIGID=$GIGID" >> "$GITHUB_OUTPUT"
+
+examples:
+  # TODO: finish the example
+  example:
+    description: Sample example description.
+    usage:
+      version: 2.1
+      orbs:
+        ci-issues: mergifyio/ci-issues@0.0.1
+      jobs:
+        ci-job:
+          docker:
+            - image: cimg/ubuntu:current
+          steps:
+            - checkout
+            - python/install-packages:
+                pkg-manager: poetry
+            - run: pytest -v -s --junitxml=reports/junit.xml
+            - ci-issues/upload:
+                token: MERGIFY_SECRET_TOKEN
+                repository_url: <<pipeline.trigger_parameters.github_app.repo_url>>
+                report_paths: reports/junit.xml
+      workflows:
+        continuous_integration:
+          jobs:
+            - ci-job:
+                context:
+                  - test_context
