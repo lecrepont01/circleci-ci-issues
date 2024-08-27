@@ -1,0 +1,25 @@
+description: Sample example description.
+
+usage:
+  version: 2.1
+  orbs:
+    ci-issues: mergifyio/ci-issues@0.0.1
+  jobs:
+    ci-job:
+      docker:
+        - image: cimg/ubuntu:current
+      steps:
+        - checkout
+        - python/install-packages:
+            pkg-manager: poetry
+        - run: pytest -v -s --junitxml=reports/junit.xml
+        - ci-issues/upload:
+            token: MERGIFY_SECRET_TOKEN
+            repository_url: <<pipeline.trigger_parameters.github_app.repo_url>>
+            report_paths: reports/junit.xml
+  workflows:
+    continuous_integration:
+      jobs:
+        - ci-job:
+            context:
+              - test_context

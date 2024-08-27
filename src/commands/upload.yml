@@ -1,0 +1,27 @@
+description: Upload the XML report
+parameters:
+  token:
+    type: env_var_name
+    description: CI Issues Application Key
+    default: MERGIFY_CI_ISSUES_TOKEN
+  repository_url:
+    description: |
+      URL of the repository (should provide pipeline.trigger_parameters.github_app.repo_url)
+    type: string
+  report_paths:
+    description: Paths of the XML files to upload
+    type: string
+  mergify_api_server:
+    description: URL of the Mergify API
+    type: string
+    default: https://api.mergify.com/v1
+steps:
+  - run:
+      name: Uploading the reports to Mergify CI Issues
+      environment:
+        TOKEN: <<parameters.token>>
+        REPO_URL: <<parameters.repository_url>>
+        FILES: <<parameters.report_paths>>
+        MERGIFY_API_SERVER: <<parameters.mergify_api_server>>
+      when: always
+      command: <<include(scripts/upload.sh)>>

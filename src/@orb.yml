@@ -1,0 +1,10 @@
+version: 2.1
+
+description: >
+  CircleCI integration with Mergify CI Issues. This orbs is shipped with
+  a command to add to your pipeline that uploads your JUnit xml reports
+  to Mergify CI Issues.
+
+display:
+  home_url: "https://mergify.com/"
+  source_url: "https://github.com/Mergifyio/circleci-ci-issues"
