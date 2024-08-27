@@ -62,7 +62,7 @@ jobs:
         run: |
           bash src/scripts/upload.sh
         env:
-          REPO_URL: https://github.com/${GITHUB_REPOSITORY}
+          REPO_URL: https://github.com/$GITHUB_REPOSITORY
           TOKEN: fake-valid-token
           CIRCLE_JOB: test
           CIRCLE_SHA1: 948da8c01b17ac2164039f3150221d5cfcae7ecc
