@@ -1,0 +1,11 @@
+services:
+  mockServer:
+    image: mockserver/mockserver:5.15.0
+#    command: -logLevel DEBUG
+    ports:
+      - 1080:1080
+    environment:
+      MOCKSERVER_LOG_LEVEL: DEBUG
+      MOCKSERVER_INITIALIZATION_JSON_PATH: /config/expectationInitializer.json
+    volumes:
+      - ./zfixtures:/config

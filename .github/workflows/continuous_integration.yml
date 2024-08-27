@@ -37,18 +37,29 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-22.04
     services:
-      mockServer:
-        image: mockserver/mockserver:5.15.0
-        ports:
-          - 1080:1080
-        volumes:
-          - ./fixtures:/fixtures
-        env:
-          MOCKSERVER_LOG_LEVEL: DEBUG
-          MOCKSERVER_INITIALIZATION_JSON_PATH: /fixtures/expectationInitialiser.json
+#      mockServer:
+#        image: mockserver/mockserver:5.15.0
+#        ports:
+#          - 1080:1080
+#        volumes:
+#          - ${{ github.workspace }}/zfixtures:/config
+#        env:
+#          MOCKSERVER_LOG_LEVEL: DEBUG
+#          MOCKSERVER_INITIALIZATION_JSON_PATH: /config/expectationInitializer.json
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4.1.7
+
+      - name: Start mockServer with expectation initializer
+        run: |
+          docker-compose up -d
+          sleep 1
+          docker compose logs
+
+      - name: Ensure zfixtures directory exists
+        run: |
+          ls -la ${{ github.workspace }}/zfixtures
+          cat ${{ github.workspace }}/zfixtures/expectationInitializer.json
 
       - name: Install CircleCI CLI
         run: curl -fLSs https://raw.githubusercontent.com/CircleCI-Public/circleci-cli/main/install.sh | bash
@@ -60,11 +71,16 @@ jobs:
 
       - name: Test Orb script
         run: |
+          export FAKE_VALID_TOKEN=fake-valid-token
           bash src/scripts/upload.sh
         env:
-          REPO_URL: https://github.com/$GITHUB_REPOSITORY
-          TOKEN: fake-valid-token
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          TOKEN: FAKE_VALID_TOKEN
           CIRCLE_JOB: test
           CIRCLE_SHA1: 948da8c01b17ac2164039f3150221d5cfcae7ecc
-          FILES: junit_example.xml
+          FILES: zfixtures/junit_example.xml
           MERGIFY_API_SERVER: http://localhost:1080
+
+      - name: Mockserver logs
+        if: always()
+        run: docker compose logs
