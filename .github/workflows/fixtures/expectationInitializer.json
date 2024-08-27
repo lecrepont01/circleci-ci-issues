@@ -1,0 +1,24 @@
+[
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/repos/Mergifyio/circleci-ci-issues/ci_issues_upload",
+      "headers": {
+        "Authorization": "bearer fake-valid-token"
+      },
+      "body": {
+        "type": "REGEX",
+        "regex": ".*Content-Disposition: form-data; name=\"name\"\r\n\r\ntest\r\n.*Content-Disposition: form-data; name=\"provider\"\r\n\r\ncircleci\r\n.*Content-Disposition: form-data; name=\"head_sha\"\r\n\r\n948da8c01b17ac2164039f3150221d5cfcae7ecc\r\n.*Content-Disposition: form-data; name=\"files\"; filename=\"junit_example.xml\"\r\nContent-Type: application/xml\r\n\r\n.*"
+      }
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "body": "{\"gigid\": \"1234azertyuiop\"}",
+      "headers": {
+        "Content-Type": [
+          "application/json"
+        ]
+      }
+    }
+  }
+]

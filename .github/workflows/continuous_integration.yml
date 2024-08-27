@@ -36,6 +36,16 @@ jobs:
   validate_orb:
     timeout-minutes: 5
     runs-on: ubuntu-22.04
+    services:
+      mockServer:
+        image: mockserver/mockserver:5.15.0
+        ports:
+          - 1080:1080
+        volumes:
+          - ./fixtures:/fixtures
+        env:
+          MOCKSERVER_LOG_LEVEL: DEBUG
+          MOCKSERVER_INITIALIZATION_JSON_PATH: /fixtures/expectationInitialiser.json
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4.1.7
@@ -48,23 +58,13 @@ jobs:
           circleci orb pack src > orb.yml
           circleci orb validate orb.yml
 
-#  test_script:
-#    timeout-minutes: 5
-#    runs-on: ubuntu-22.04
-#    steps:
-#      - name: Checkout 🛎️
-#        uses: actions/checkout@v4.1.7
-#
-#      - name: Setup Python 🔧
-#        uses: actions/setup-python@v5.1.1
-#        with:
-#          python-version: 3.12.5
-#
-#      - name: Install Python dependencies
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install pytest
-#
-#      - name: Run tests
-#        run: |
-#          pytest
+      - name: Test Orb script
+        run: |
+          bash src/scripts/upload.sh
+        env:
+          REPO_URL: https://github.com/${GITHUB_REPOSITORY}
+          TOKEN: fake-valid-token
+          CIRCLE_JOB: test
+          CIRCLE_SHA1: 948da8c01b17ac2164039f3150221d5cfcae7ecc
+          FILES: junit_example.xml
+          MERGIFY_API_SERVER: http://localhost:1080
