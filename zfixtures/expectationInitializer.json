@@ -8,7 +8,7 @@
       },
       "body": {
         "type": "REGEX",
-        "regex": ".*Content-Disposition: form-data; name=\"name\"\r\n\r\ntest\r\n.*Content-Disposition: form-data; name=\"provider\"\r\n\r\ncircleci\r\n.*Content-Disposition: form-data; name=\"head_sha\"\r\n\r\n948da8c01b17ac2164039f3150221d5cfcae7ecc\r\n.*Content-Disposition: form-data; name=\"files\"; filename=\"junit_example.xml\"\r\nContent-Type: application/xml\r\n\r\n.*"
+        "regex": ".*Content-Disposition: form-data; name=\\\"name\\\"\\r\\n\\r\\ntest\\r\\n.*\\r\\nContent-Disposition: form-data; name=\\\"provider\\\"\\r\\n\\r\\ncircleci\\r\\n.*\\r\\nContent-Disposition: form-data; name=\\\"head_sha\\\"\\r\\n\\r\\n948da8c01b17ac2164039f3150221d5cfcae7ecc\\r\\n.*\\r\\nContent-Disposition: form-data; name=\\\"files\\\"; filename=\\\"junit_example.xml\\\"\\r\\nContent-Type: application/xml\\r\\n\\r\\n.*"
       }
     },
     "httpResponse": {
