@@ -1,25 +1,37 @@
-description: Sample example description.
+description: |
+  Uploading pytest JUnit reports to CI Issues.
 
 usage:
   version: 2.1
+
   orbs:
-    ci-issues: mergifyio/ci-issues@0.0.1
+    python: circleci/python@2.1.1
+    mergifyio: mergifyio/ci-issues@1.2.3
+
   jobs:
-    ci-job:
-      docker:
-        - image: cimg/ubuntu:current
+    run_tests:
+      executor:
+        name: python/default
+        tag: 3.12.5
       steps:
         - checkout
         - python/install-packages:
             pkg-manager: poetry
-        - run: pytest -v -s --junitxml=reports/junit.xml
-        - ci-issues/upload:
-            token: MERGIFY_SECRET_TOKEN
+        - run:
+            name: Run tests
+            command: |
+              mkdir test_results
+              poetry run pytest -vv --junitxml=test_results/report.xml
+        - mergifyio/upload:
+            token: MERGIFY_CI_ISSUES_TOKEN
             repository_url: <<pipeline.trigger_parameters.github_app.repo_url>>
-            report_paths: reports/junit.xml
+            report_paths: test_results/report.xml
+        - store_test_results:
+            path: test_results
+
   workflows:
     continuous_integration:
       jobs:
-        - ci-job:
+        - run_tests:
             context:
-              - test_context
+              - ci_secrets
