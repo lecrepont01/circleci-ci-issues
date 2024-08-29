@@ -21,4 +21,5 @@ curl -X POST \
 
 GIGID=$(cat result.json | jq -r .gigid)
 echo "::notice title=CI Issues report::CI_ISSUE_GIGID=$GIGID"
-echo "CI_ISSUE_GIGID=$GIGID" >> "$GITHUB_OUTPUT"
+
+echo "CI_ISSUE_GIGID=$GIGID"
