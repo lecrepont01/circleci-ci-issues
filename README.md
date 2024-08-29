@@ -9,9 +9,10 @@ to Mergify CI Issues.
 
 ## Usage
 
-TODO: share the registry page ensuring examples are displayed there.
+Please refer to the example in the [Orb registry](https://circleci.com/developer/orbs/orb/mergifyio/ci-issues#usage-example).
 
 ## Resources
 
 - [Landing page](https://mergify.com/ci-issues) of the product.
 - Mergify [CI Issues](https://dashboard.mergify.com/ci-issues).
+- Orb in CircleCI [registry](https://circleci.com/developer/orbs/orb/mergifyio/ci-issues).
