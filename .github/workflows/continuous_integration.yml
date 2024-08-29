@@ -50,7 +50,7 @@ jobs:
         id: gigid
         run: |
           export FAKE_VALID_TOKEN=fake-valid-token
-          bash src/scripts/upload.sh
+          bash src/scripts/upload.sh >> "$GITHUB_OUTPUT"
         env:
           REPO_URL: ${{ github.server_url }}/${{ github.repository }}
           TOKEN: FAKE_VALID_TOKEN
