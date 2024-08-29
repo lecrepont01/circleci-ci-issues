@@ -1,0 +1,40 @@
+name: Deploy Orb
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  release:
+    timeout-minutes: 5
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4.1.7
+
+      # CircleCI only let us promote with patch, minor or major command argument
+      # Uses a tag in the following format: <semver>-<patch|minor|major>
+      - name: Get CircleCI Increment from tag
+        id: circleci_increment
+        run: |
+          if [[ ${{ github.ref_name }} =~ [0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}\-(patch|minor|major) ]]; then
+            echo "CIRCLECI_INCREMENT_ARG=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "Invalid tag: ${{ github.ref_name }}, expected <semver>-<patch|minor|major>"
+            exit 1
+          fi
+
+      - name: Install CircleCI CLI
+        run: |
+          curl -fLSs https://raw.githubusercontent.com/CircleCI-Public/circleci-cli/main/install.sh | bash
+
+      - name: Publish Orb version
+        run: |
+          circleci orb pack src > orb.yml
+          circleci orb validate orb.yml
+          circleci orb publish orb.yml mergifyio/ci-issues@dev:test_version \
+            --token ${{ secrets.CIRCLECI_API_TOKEN }}
+          circleci orb publish promote mergifyio/ci-issues@dev:test_version \
+            ${{ steps.circleci_increment.outputs.CIRCLECI_INCREMENT_ARG }} \
+            --token ${{ secrets.CIRCLECI_API_TOKEN }}
